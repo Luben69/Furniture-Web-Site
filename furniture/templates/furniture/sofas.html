@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy Home - Sofas</title>
+    <link rel="stylesheet" href="{% static 'furniture/css/sections.css' %}">
+</head>
+<body>
+  
+    <header>
+        <h1>Cozy Home</h1>
+        <nav> 
+            <a href="{% url 'home' %}">Home</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </nav>  
+        <a href="{% url 'view_cart' %}" id="cart-count">
+          Cart: {{ cart_item_count }}
+        </a>
+    </header>
+
+  <section class="hero">
+    <h2>Welcome to Cozy Home</h2>
+    <p>Find the perfect furniture for your space.</p>
+  </section>
+
+<section class="sofas">
+  <div class="sofas-grid">
+    {% for product in products %}
+    <div class="product" data-id="sofa{{ forloop.counter }}" data-name="{{ product.name }}" data-price="{{ product.price }}">
+        <a href="{% url 'product_detail' product_id=product.id %}">
+            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+        </a>
+        <h3>{{ product.name }}</h3>
+        <p>${{ product.price }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+</body>
+</html>

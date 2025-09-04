@@ -1,0 +1,29 @@
+{% if cart_items %}
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in cart_items %}
+            <tr>
+                <td>{{ obj.item.product.name }}</td>
+                <td>${{ obj.item.product.price }}</td>
+                <td>{{ obj.item.quantity }}</td>
+                <td>${{ obj.subtotal }}</td>
+                <td>
+                    <a href="{% url 'remove_from_cart' obj.item.id %}">Remove</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>Total: ${{ total_price }}</p>
+{% else %}
+    <p>Your cart is empty.</p>
+{% endif %}

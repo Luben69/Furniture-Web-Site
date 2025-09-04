@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cozy Home Furniture</title>
+  <link rel="stylesheet" href="{% static 'furniture/css/home.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+      <header>
+        <h1>Shopping</h1>
+        <div class="shopping">
+          <a href="{% url 'view_cart' %}" class="shopping">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="quantity">{{ cart_item_count }}</span>
+          </a>
+        </div>
+
+        <div class="auth-links">
+          {% if user.is_authenticated %}
+            Hi, {{ user.username }} |
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+              {% csrf_token %}
+                <button type="submit" style="background:none;border:none;padding:0;color:blue;cursor:pointer;">
+                  Logout
+                </button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}">Login</a> | <a href="{% url 'signup' %}">Sign Up</a>
+          {% endif %}
+        </div>
+      </header>
+
+      <div class="list"></div>
+    </div>
+
+    <div class="card">
+      <h1>Card</h1>
+      <ul class="listCard"></ul>
+      <div class="checkOut">
+        <div class="total">0</div>
+        <div class="closeShopping">Close</div>
+      </div>
+    </div>
+    
+  <section class="hero">
+    <h2>Comfortable Sofas</h2>
+    <p>Find the perfect sofa for your space.</p>
+  </section>
+
+  <section id="categories">
+    <h2>Our Sections</h2>
+    <div class="flexbox">
+      <div class="category">
+        <!-- chairs -->
+         <a href="{% url 'chairs' %}">
+          <img src="{% static 'furniture/imagez/chair.webp' %}" alt="Chairs">
+         </a>
+         <h1>Chairs</h1>
+      </div>
+      <div class="category">
+        <!-- sofas -->
+        <a href="{% url 'sofas' %}">
+          <img src="{% static 'furniture/imagez/sofa.jpg' %}" alt="Sofas">
+         </a>
+         <h1>Sofas</h1>
+      </div>
+      <div class="category">
+        <!-- tables -->
+        <a href="sections/tables/tables.html">
+          <img src="{% static 'furniture/imagez/table.jpg' %}" alt="Tables">
+         </a>
+         <h1>Tables</h1>
+      </div>
+      <div class="category">
+        <!-- beds -->
+        <a href="sections/beds/beds.html">
+          <img src="{% static 'furniture/imagez/bed.webp' %}" alt="Beds">
+         </a>
+         <h1>Beds</h1>
+      </div>
+      <div class="category">
+        <!-- lamps -->
+        <a href="sections/lamps/lamps.html">
+          <img src="{% static 'furniture/imagez/lamp.webp' %}" alt="Lamps">
+         </a>
+         <h1>Lamps</h1>
+      </div>
+      <div class="category">
+        <!-- desks -->
+        <a href="sections/desks/desks.html">
+          <img src="{% static 'furniture/imagez/desk.webp' %}" alt="Desks">
+         </a>
+         <h1>Desks</h1>
+      </div>
+      <div class="category">
+        <!-- paintings -->
+        <a href="sections/paintings/paintings.html">
+          <img src="{% static 'furniture/imagez/painting.webp' %}" alt="Paintings">
+         </a>
+         <h1>Paintings</h1>
+      </div>
+      <div class="category">
+        <!-- doors -->
+        <a href="sections/doors/doors.html">
+          <img src="{% static 'furniture/imagez/door.webp' %}" alt="Doors">
+         </a>
+         <h1>Doors</h1>
+      </div>
+      <div class="category">
+        <!-- decoration -->
+        <a href="sections/decoration/decoration.html">
+          <img src="{% static 'furniture/imagez/decoration_books.jpg' %}" alt="Decoration">
+         </a>
+         <h1>Decoration</h1>
+      </div>
+      <div class="category">
+        <!-- curtains -->
+        <a href="sections/curtains/curtains.html">
+          <img src="{% static 'furniture/imagez/curtains.jpg' %}" alt="Curtains">
+         </a>
+         <h1>Curtains</h1>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2>About Us</h2>
+    <p>We offer stylish, comfortable, and affordable furniture for every home.</p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Email us at: contact@cozyhome.com</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Cozy Home Furniture</p>
+  </footer>
+
+</body>
+</html>
