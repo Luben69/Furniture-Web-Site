@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
 
 
 # Create your views here.
@@ -46,26 +47,26 @@ def test_auth(request):
         return HttpResponse(f"Guest user with session key: {request.session.session_key}")
 
 
-def cart(request):
-    cart = get_cart(request)              # get current cart (user or session)
-    items = cart.items.all()              # fetch all CartItem objects for this cart
+# def cart(request):
+#     cart = get_cart(request)              # get current cart (user or session)
+#     items = cart.items.all()              # fetch all CartItem objects for this cart
 
-    # calculate subtotal and total
-    cart_items = []
-    total_price = 0
-    for item in items:
-        subtotal = item.product.price * item.quantity
-        total_price += subtotal
-        cart_items.append({
-            "item": item,
-            "subtotal": subtotal
-        })
+#     # calculate subtotal and total
+#     cart_items = []
+#     total_price = 0
+#     for item in items:
+#         subtotal = item.product.price * item.quantity
+#         total_price += subtotal
+#         cart_items.append({
+#             "item": item,
+#             "subtotal": subtotal
+#         })
 
-    return render(request, "furniture/cart.html", {
-        "cart": cart,
-        "cart_items": cart_items,
-        "total_price": total_price
-    })
+#     return render(request, "furniture/cart.html", {
+#         "cart": cart,
+#         "cart_items": cart_items,
+#         "total_price": total_price
+#     })
 
 
 def sofas(request):
@@ -105,11 +106,21 @@ def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     quantity = int(request.POST.get("quantity", 1))
 
+    if quantity > product.stock:
+        messages.error(request, f"only {product.stock} items are in stock.")
+        return redirect('product_detail', product_id = product.id)
+    
+
     item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
     if not created:
         item.quantity += quantity
     else:
         item.quantity = quantity
+
+    product.stock -= quantity 
+
+    product.save()
     item.save()
 
     return redirect('product_detail', product_id=product.id)

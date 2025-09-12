@@ -19,6 +19,13 @@
         <a href="{% url 'view_cart' %}" id="cart-count">Cart: {{ cart_item_count }}</a>
     </header>
 
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+
     <section class="product-detail">
         <h2>{{ product.name }}</h2>
         <p>Price: ${{ product.price }}</p>
@@ -34,12 +41,26 @@
 
         <!-- Add to Cart Form -->
         <form method="post" action="{% url 'add_to_cart' product.id %}">
-            <h2>In stock: {{ product.stock }}</h2>
             {% csrf_token %}
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" value="1" min="1">
-            <button type="submit" class="add-to-cart">Add to Cart</button>
+    
+            {% if product.stock == 0 %}
+                <h2 style="color: red;">OUT OF STOCK</h2>
+                <button disabled>Out of Stock</button>
+            {% else %}
+                <h2>In stock: {{ product.stock }}</h2>
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                <button type="submit" class="add-to-cart">Add to Cart</button>
+            {% endif %}
         </form>
+
     </section>
 </body>
 </html>
+
+
+{% comment %} {% if product.stock == 0 %}
+    <h2 class="out-of-stock">OUT OF STOCK</h2>
+{% else %}
+    <h2>In stock: {{ product.stock }}</h2>
+{% endif %} {% endcomment %}
