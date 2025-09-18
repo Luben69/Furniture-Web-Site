@@ -7,7 +7,7 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -15,12 +15,21 @@ def home(request):
     return render(request, 'furniture/index.html')
 
 
+def cart_count(request):
+    cart = get_cart(request)
+    count = sum(item.quantity for item in cart.items.all())
+    return JsonResponse({"cart_count": count})
+
+
 class MyLoginView(LoginView):
-    template_name = 'furniture/login.html'  # your login template
+    print('HELLO U ARE AT LOGGIN IN')
+    template_name = 'furniture/login.html'  # login template
     authentication_form = AuthenticationForm
 
     def form_valid(self, form):
+        breakpoint()
         # Save old guest session key before login (session rotates after login)
+        print(self.request.session.session_key)
         self.request.session['_old_session_key'] = self.request.session.session_key
         return super().form_valid(form)
     
@@ -47,6 +56,83 @@ def test_auth(request):
         return HttpResponse(f"Guest user with session key: {request.session.session_key}")
 
 
+# @require_POST
+# def update_cart_item(request, item_id):
+#     action = request.POST.get("action")  # "increase" or "decrease"
+#     cart_item = get_object_or_404(CartItem, id=item_id)
+#     product = cart_item.product
+
+#     if action == "increase":
+#         if product.stock > 0:
+#             cart_item.quantity += 1
+#             product.stock -= 1
+#             cart_item.save()
+#             product.save()
+#         else:
+#             messages.error(request, f"Sorry, {product.name} is out of stock.")
+
+#     elif action == "decrease":
+#         if cart_item.quantity > 0:
+#             cart_item.quantity -= 1
+#             product.stock += 1
+
+#             if cart_item.quantity == 0:
+#                 cart_item.delete()  # remove item completely
+#             else:
+#                 cart_item.save()
+
+#             product.save()
+
+#     return redirect("view_cart")  # replace with your cart page’s URL name
+
+
+@require_POST
+def update_cart_item(request, item_id):
+    action = request.POST.get("action")
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    product = cart_item.product
+
+    if action == "increase":
+        if product.stock > 0:
+            cart_item.quantity += 1
+            product.stock -= 1
+            cart_item.save()
+        else:
+            return JsonResponse({"success": False, "message": f"{product.name} is out of stock."})
+
+    elif action == "decrease":
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            product.stock += 1
+            cart_item.save()
+        elif cart_item.quantity == 1:
+            # Removing item completely
+            product.stock += 1
+            cart_item.delete()
+            cart_item = None  # mark as deleted
+        else:
+            return JsonResponse({"success": False, "message": "Cannot decrease further."})
+
+    product.save()
+
+    cart = get_cart(request)
+    cart_item_count = sum(item.quantity for item in cart.items.all())
+    total_price = sum(item.product.price * item.quantity for item in cart.items.all())
+
+    new_subtotal = 0
+    if cart_item:
+        new_subtotal = cart_item.product.price * cart_item.quantity
+
+    return JsonResponse({
+        "success": True,
+        "new_quantity": cart_item.quantity if cart_item else 0,
+        "new_subtotal": f"{new_subtotal:.2f}",
+        "total_price": f"{total_price:.2f}",
+        "cart_item_count": cart_item_count
+    })
+
+
+
 # def cart(request):
 #     cart = get_cart(request)              # get current cart (user or session)
 #     items = cart.items.all()              # fetch all CartItem objects for this cart
@@ -69,15 +155,48 @@ def test_auth(request):
 #     })
 
 
-def sofas(request):
-    products = Product.objects.filter(category__name="sofa")
-    return render(request, "furniture/sofas.html", {
-        "products": products,
-    })
-
-
 def chairs(request):
     products = Product.objects.filter(category__name="chair")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def sofas(request):
+    products = Product.objects.filter(category__name="sofa")
+    return render(request, "furniture/sofas.html", {"products": products,})
+
+
+def tables(request):
+    products = Product.objects.filter(category__name="table")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def beds(request):
+    products = Product.objects.filter(category__name="bed")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def lamps(request):
+    products = Product.objects.filter(category__name="lamp")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def desks(request):
+    products = Product.objects.filter(category__name="desk")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def paintings(request):
+    products = Product.objects.filter(category__name="painting")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def doors(request):
+    products = Product.objects.filter(category__name="door")
+    return render(request, "furniture/chairs.html", {"products": products})
+
+
+def curtains(request):
+    products = Product.objects.filter(category__name="curtain")
     return render(request, "furniture/chairs.html", {"products": products})
 
 

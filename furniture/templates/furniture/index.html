@@ -13,9 +13,9 @@
       <header>
         <h1>Shopping</h1>
         <div class="shopping">
-          <a href="{% url 'view_cart' %}" class="shopping">
+          <a href="{% url 'view_cart' %}">
             <i class="fa-solid fa-bag-shopping"></i>
-            <span class="quantity">{{ cart_item_count }}</span>
+            <span id="cart-count">{{ cart_item_count }}</span>
           </a>
         </div>
 
@@ -37,14 +37,14 @@
       <div class="list"></div>
     </div>
 
-    <div class="card">
+    {% comment %} <div class="card">
       <h1>Card</h1>
       <ul class="listCard"></ul>
       <div class="checkOut">
         <div class="total">0</div>
         <div class="closeShopping">Close</div>
       </div>
-    </div>
+    </div> {% endcomment %}
     
   <section class="hero">
     <h2>Comfortable Sofas</h2>
@@ -54,76 +54,62 @@
   <section id="categories">
     <h2>Our Sections</h2>
     <div class="flexbox">
-      <div class="category">
-        <!-- chairs -->
-         <a href="{% url 'chairs' %}">
-          <img src="{% static 'furniture/imagez/chair.webp' %}" alt="Chairs">
-         </a>
-         <h1>Chairs</h1>
-      </div>
-      <div class="category">
+
+      <!-- chairs -->
+      <a href="{% url 'chairs' %}" class="category">
+        <img src="{% static 'furniture/imagez/chair.jpg' %}" alt="Chairs">
+        <h1>Chairs</h1>
+      </a>
+
         <!-- sofas -->
-        <a href="{% url 'sofas' %}">
-          <img src="{% static 'furniture/imagez/sofa.jpg' %}" alt="Sofas">
-         </a>
-         <h1>Sofas</h1>
-      </div>
-      <div class="category">
+      <a href="{% url 'sofas' %}" class="category">
+        <img src="{% static 'furniture/imagez/sofa.webp' %}" alt="Sofas">
+        <h1>Sofas</h1>
+      </a>
+
         <!-- tables -->
-        <a href="sections/tables/tables.html">
-          <img src="{% static 'furniture/imagez/table.jpg' %}" alt="Tables">
-         </a>
-         <h1>Tables</h1>
-      </div>
-      <div class="category">
+      <a href="sections/tables/tables.html" class="category">
+        <img src="{% static 'furniture/imagez/table.webp' %}" alt="Tables">
+        <h1>Tables</h1>
+      </a>
+
         <!-- beds -->
-        <a href="sections/beds/beds.html">
-          <img src="{% static 'furniture/imagez/bed.webp' %}" alt="Beds">
-         </a>
-         <h1>Beds</h1>
-      </div>
-      <div class="category">
+      <a href="sections/beds/beds.html" class="category">
+        <img src="{% static 'furniture/imagez/bed.jpg' %}" alt="Beds">
+        <h1>Beds</h1>
+      </a>
+        
         <!-- lamps -->
-        <a href="sections/lamps/lamps.html">
-          <img src="{% static 'furniture/imagez/lamp.webp' %}" alt="Lamps">
-         </a>
-         <h1>Lamps</h1>
-      </div>
-      <div class="category">
+      <a href="sections/lamps/lamps.html" class="category">
+        <img src="{% static 'furniture/imagez/lamp.jpg' %}" alt="Lamps">
+        <h1>Lamps</h1>
+      </a>
+        
+
         <!-- desks -->
-        <a href="sections/desks/desks.html">
-          <img src="{% static 'furniture/imagez/desk.webp' %}" alt="Desks">
-         </a>
-         <h1>Desks</h1>
-      </div>
-      <div class="category">
+      <a href="sections/desks/desks.html" class="category">
+        <img src="{% static 'furniture/imagez/desk.jpg' %}" alt="Desks">
+        <h1>Desks</h1>
+      </a>
+        
         <!-- paintings -->
-        <a href="sections/paintings/paintings.html">
-          <img src="{% static 'furniture/imagez/painting.webp' %}" alt="Paintings">
-         </a>
-         <h1>Paintings</h1>
-      </div>
-      <div class="category">
+      <a href="sections/paintings/paintings.html" class="category">
+        <img src="{% static 'furniture/imagez/painting.webp' %}" alt="Paintings">
+        <h1>Paintings</h1>
+      </a>
+        
         <!-- doors -->
-        <a href="sections/doors/doors.html">
-          <img src="{% static 'furniture/imagez/door.webp' %}" alt="Doors">
-         </a>
-         <h1>Doors</h1>
-      </div>
-      <div class="category">
-        <!-- decoration -->
-        <a href="sections/decoration/decoration.html">
-          <img src="{% static 'furniture/imagez/decoration_books.jpg' %}" alt="Decoration">
-         </a>
-         <h1>Decoration</h1>
-      </div>
-      <div class="category">
+      <a href="sections/doors/doors.html" class="category">
+        <img src="{% static 'furniture/imagez/door.webp' %}" alt="Doors">
+        <h1>Doors</h1>
+      </a>
+
         <!-- curtains -->
-        <a href="sections/curtains/curtains.html">
-          <img src="{% static 'furniture/imagez/curtains.jpg' %}" alt="Curtains">
-         </a>
-         <h1>Curtains</h1>
-      </div>
+      <a href="sections/curtains/curtains.html" class="category">
+        <img src="{% static 'furniture/imagez/curtain.jpg' %}" alt="Curtains">
+        <h1>Curtains</h1>
+      </a>
+      
     </div>
   </section>
 
@@ -140,6 +126,43 @@
   <footer>
     <p>&copy; 2025 Cozy Home Furniture</p>
   </footer>
+
+   <body>
+  ...
+  {% comment %} <div class="shopping">
+    <a href="{% url 'view_cart' %}">
+      <i class="fa-solid fa-bag-shopping"></i>
+      <span id="cart-count">{{ cart_item_count }}</span>
+    </a>
+  </div> {% endcomment %}
+  ...
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cartCountEl = document.querySelector('#cart-count');
+
+      function updateCartCount() {
+          fetch('/cart/count/')
+              .then(res => res.json())
+              .then(data => {
+                  cartCountEl.textContent = data.cart_count;
+                  localStorage.setItem('cart_count', data.cart_count);
+              });
+      }
+
+      if (cartCountEl) {
+          // Initial load
+          updateCartCount();
+        
+          // Update when user comes back to tab
+          document.addEventListener('visibilitychange', () => {
+              if (!document.hidden) {
+                  updateCartCount();
+              }
+          });
+      }
+    });
+  </script>
 
 </body>
 </html>

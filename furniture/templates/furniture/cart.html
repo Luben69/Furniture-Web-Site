@@ -1,29 +1,87 @@
 {% if cart_items %}
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for obj in cart_items %}
-            <tr>
-                <td>{{ obj.item.product.name }}</td>
-                <td>${{ obj.item.product.price }}</td>
-                <td>{{ obj.item.quantity }}</td>
-                <td>${{ obj.subtotal }}</td>
-                <td>
-                    <a href="{% url 'remove_from_cart' obj.item.id %}">Remove</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <p>Total: ${{ total_price }}</p>
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for obj in cart_items %}
+        <tr>
+            <td>{{ obj.item.product.name }}</td>
+            <td>${{ obj.item.product.price }}</td>
+            <td>
+                <button class="minus" data-id="{{ obj.item.id }}">-</button>
+                <span class="quantity">{{ obj.item.quantity }}</span>
+                <button class="plus" data-id="{{ obj.item.id }}">+</button>
+            </td>
+            <td>${{ obj.subtotal }}</td>
+            <td>
+                <a href="{% url 'remove_from_cart' obj.item.id %}">Remove</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p>Total: $<span id="total-price">{{ total_price }}</span></p>
 {% else %}
-    <p>Your cart is empty.</p>
+<p>Your cart is empty.</p>
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Update navbar cart badge from localStorage
+    const savedCount = localStorage.getItem('cart_count');
+    const cartCountEl = document.querySelector('#cart-count'); // ID selector
+    if (savedCount && cartCountEl) {
+        cartCountEl.textContent = savedCount;
+    }
+
+    // Attach click handlers to +/- buttons
+    document.querySelectorAll('.plus, .minus').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.dataset.id;
+            const action = this.classList.contains('plus') ? 'increase' : 'decrease';
+            const csrfToken = '{{ csrf_token }}';
+
+            fetch(`/cart/update/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: `action=${action}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update row or remove if quantity is 0
+                    const row = this.closest('tr');
+                    if (data.new_quantity === 0) {
+                        row.remove();
+                    } else {
+                        row.querySelector('.quantity').textContent = data.new_quantity;
+                        row.querySelector('td:nth-child(4)').textContent = `${data.new_subtotal}`;
+                    }
+
+                    // Update total price
+                    const totalPriceEl = document.querySelector('#total-price');
+                    if (totalPriceEl) totalPriceEl.textContent = data.total_price;
+
+                    // Update navbar badge & localStorage
+                    if (cartCountEl) {
+                        cartCountEl.textContent = data.cart_item_count;
+                        localStorage.setItem('cart_count', data.cart_item_count);
+                    }
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+    });
+});
+</script>
