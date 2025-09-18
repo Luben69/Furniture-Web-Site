@@ -1,41 +1,47 @@
-.sofas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-.sofas-grid img {
-    width: 100%;         /* fill the container width */
-    max-width: 250px;    /* optional: limit max width */
-    height: 180px;       /* control height */
-    object-fit: cover;   /* keep aspect ratio */
-    border: 4px solid #030303;
-    border-radius: 8px;
-    margin: 0 auto;      /* center inside grid item */
-    display: block;
-}
-
 .product h3, .product p, .product button {
     text-align: center;
 }
 
-.chairs-grid {
+
+.section-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* each product at least 250px wide */
+    gap: 20px;       /* spacing between products */
     padding: 20px;
+    justify-items: center; /* center products inside each grid cell */
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.chairs-grid img {
-    width: 100%;         /* fill the container width */
-    max-width: 250px;    /* optional: limit max width */
-    height: 350px;       /* control height */
-    object-fit: cover;   /* keep aspect ratio */
+
+.section-grid .product a {
+    display: inline-block; /* shrink-wrap to image size */
+}
+
+
+.section-grid .product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 279px;      /* fixed width for all products */
+}
+
+
+.section-grid .product img {
+    width: 100%;       /* fill product width */
+    height: 400px;     /* fixed height for symmetry */
+    object-fit: cover; /* crop excess but keep aspect ratio */
     border: 4px solid #030303;
     border-radius: 8px;
-    margin: 0 auto;      /* center inside grid item */
     display: block;
+    margin-bottom: 10px;
 }
 
 
+
+.section-grid .product h3,
+.section-grid .product p,
+.section-grid .product button {
+    margin: 0.5em 0;
+}

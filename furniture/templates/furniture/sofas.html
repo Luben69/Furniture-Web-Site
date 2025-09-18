@@ -28,7 +28,7 @@
   </section>
 
 <section class="sofas">
-  <div class="sofas-grid">
+  <div class="section-grid">
     {% for product in products %}
     <div class="product" data-id="sofa{{ forloop.counter }}" data-name="{{ product.name }}" data-price="{{ product.price }}">
         <a href="{% url 'product_detail' product_id=product.id %}">
