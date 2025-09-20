@@ -19,19 +19,20 @@
         <a href="{% url 'view_cart' %}" id="cart-count">Cart: {{ cart_item_count }}</a>
     </header>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="message {{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 
 
-    <section class="product-detail">
-        <h2>{{ product.name }}</h2>
-        <p>Price: ${{ product.price }}</p>
+<section class="product-detail">
+    <h2>{{ product.name }}</h2>
+    <p>Price: ${{ product.price }}</p>
 
-        <div class="gallery-container">
-            <!-- Left: Thumbnails -->
+    <div class="gallery-container">
+        <!-- Left column -->
+        <div class="left-column">
             <div class="product-images">
                 <img class="thumbnail" src="{{ product.main_image.url }}" alt="{{ product.name }}">
                 {% for img in product.images.all %}
@@ -39,16 +40,13 @@
                 {% endfor %}
             </div>
 
-            <!-- Right: Large preview -->
-            <div class="preview-image">
-                <img id="mainPreview" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+            <div class="text-box">
+                <h1>{{ product.description }}</h1>
             </div>
-        </div>
+            
 
-        <p>{{ product.description }}</p>
-
-        <!-- Add to Cart Form -->
-        <form method="post" action="{% url 'add_to_cart' product.id %}">
+            <!-- Add to Cart Form -->
+            <form method="post" action="{% url 'add_to_cart' product.id %}">
             {% csrf_token %}
     
             {% if product.stock == 0 %}
@@ -59,10 +57,17 @@
                 <label for="quantity">Quantity:</label>
                 <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
                 <button type="submit" class="add-to-cart">Add to Cart</button>
-            {% endif %}
-        </form>
+                {% endif %}
+            </form>
+        </div>
 
-    </section>
+        <!-- Right column -->
+        <div class="preview-image">
+            <img id="mainPreview" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+        </div>
+    </div>
+
+</section>
 </body>
 </html>
 
@@ -76,9 +81,3 @@
         });
     });
 </script>
-
-{% comment %} {% if product.stock == 0 %}
-    <h2 class="out-of-stock">OUT OF STOCK</h2>
-{% else %}
-    <h2>In stock: {{ product.stock }}</h2>
-{% endif %} {% endcomment %}
