@@ -6,7 +6,7 @@ from .models import Cart, CartItem
 
 @receiver(user_logged_in)
 def merge_guest_cart(sender, request, user, **kwargs):
-    breakpoint()
+    # breakpoint()
     print('HELLO U ARE AT SIGNALS IN')
     print(request.session.session_key)
     old_session_key = request.session.get('_old_session_key')

@@ -27,7 +27,7 @@ class MyLoginView(LoginView):
     authentication_form = AuthenticationForm
 
     def form_valid(self, form):
-        breakpoint()
+        # breakpoint()
         # Save old guest session key before login (session rotates after login)
         print(self.request.session.session_key)
         self.request.session['_old_session_key'] = self.request.session.session_key

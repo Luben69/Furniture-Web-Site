@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ product.name }} - Cozy Home</title>
-    <link rel="stylesheet" href="{% static 'furniture/css/sections.css' %}">
+    <link rel="stylesheet" href="{% static 'furniture/css/detailed.css' %}">
 </head>
 <body>
     <header>
@@ -30,11 +30,19 @@
         <h2>{{ product.name }}</h2>
         <p>Price: ${{ product.price }}</p>
 
-        <div class="product-images">
-            <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
-            {% for img in product.images.all %}
-                <img src="{{ img.image.url }}" alt="{{ product.name }}">
-            {% endfor %}
+        <div class="gallery-container">
+            <!-- Left: Thumbnails -->
+            <div class="product-images">
+                <img class="thumbnail" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                {% for img in product.images.all %}
+                    <img class="thumbnail" src="{{ img.image.url }}" alt="{{ product.name }}">
+                {% endfor %}
+            </div>
+
+            <!-- Right: Large preview -->
+            <div class="preview-image">
+                <img id="mainPreview" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+            </div>
         </div>
 
         <p>{{ product.description }}</p>
@@ -58,6 +66,16 @@
 </body>
 </html>
 
+<script>
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const mainPreview = document.getElementById('mainPreview');
+
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            mainPreview.src = thumbnail.src;
+        });
+    });
+</script>
 
 {% comment %} {% if product.stock == 0 %}
     <h2 class="out-of-stock">OUT OF STOCK</h2>
