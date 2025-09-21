@@ -132,6 +132,13 @@ def update_cart_item(request, item_id):
     })
 
 
+def refresh_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    return JsonResponse ({
+        "stock": product.stock,
+        "price": str(product.price),
+    })
+
 
 # def cart(request):
 #     cart = get_cart(request)              # get current cart (user or session)
@@ -226,10 +233,12 @@ def add_to_cart(request, product_id):
     quantity = int(request.POST.get("quantity", 1))
 
     if quantity > product.stock:
-        messages.error(request, f"only {product.stock} items are in stock.")
-        return redirect('product_detail', product_id = product.id)
-    
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"success": False, "error": f"Only {product.stock} items left."})
+        messages.error(request, f"Only {product.stock} items are in stock.")
+        return redirect('product_detail', product_id=product.id)
 
+    
     item, created = CartItem.objects.get_or_create(cart=cart, product=product)
 
     if not created:
@@ -241,6 +250,16 @@ def add_to_cart(request, product_id):
 
     product.save()
     item.save()
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({
+            "success": True,
+            "stock": product.stock,
+            "cart_quantity": item.quantity,
+            "product_id": product.id,
+            "price": str(product.price),  # safer than float for money
+        })
+    
 
     return redirect('product_detail', product_id=product.id)
 

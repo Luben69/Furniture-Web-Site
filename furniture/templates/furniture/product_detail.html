@@ -19,55 +19,57 @@
         <a href="{% url 'view_cart' %}" id="cart-count">Cart: {{ cart_item_count }}</a>
     </header>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
 
-<section class="product-detail">
-    <h2>{{ product.name }}</h2>
-    <p>Price: ${{ product.price }}</p>
+    <section class="product-detail">
+        <h2>{{ product.name }}</h2>
+        <p>Price: ${{ product.price }}</p>
 
-    <div class="gallery-container">
-        <!-- Left column -->
-        <div class="left-column">
-            <div class="product-images">
-                <img class="thumbnail" src="{{ product.main_image.url }}" alt="{{ product.name }}">
-                {% for img in product.images.all %}
-                    <img class="thumbnail" src="{{ img.image.url }}" alt="{{ product.name }}">
-                {% endfor %}
-            </div>
+        <div class="gallery-container">
+            <!-- Left column -->
+            <div class="left-column">
+                <div class="product-images">
+                    <img class="thumbnail" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                    {% for img in product.images.all %}
+                        <img class="thumbnail" src="{{ img.image.url }}" alt="{{ product.name }}">
+                    {% endfor %}
+                </div>
 
-            <div class="text-box">
-                <h1>{{ product.description }}</h1>
-            </div>
+                <div class="text-box">
+                    <h1>{{ product.description }}</h1>
+                </div>
             
+                <div class="add-to-cart-box" data-product-id="{{ product.id }}">
+                    <!-- Add to Cart Form -->
+                
+                    {% if product.stock == 0 %}
+                        <h2 style="color: red;">OUT OF STOCK</h2>
+                        <button disabled>Out of Stock</button>
 
-            <!-- Add to Cart Form -->
-            <form method="post" action="{% url 'add_to_cart' product.id %}">
-            {% csrf_token %}
+                    {% else %}
+                        <h3>In stock: <span id="stock-count">{{ product.stock }}</span></h3>
+
+                        <label for="quantity">Quantity:</label>
+
+                        <input type="number" id="quantity" value="1" min="1" max="{{ product.stock }}">
     
-            {% if product.stock == 0 %}
-                <h2 style="color: red;">OUT OF STOCK</h2>
-                <button disabled>Out of Stock</button>
-            {% else %}
-                <h2>In stock: {{ product.stock }}</h2>
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
-                <button type="submit" class="add-to-cart">Add to Cart</button>
-                {% endif %}
-            </form>
+                        <button id="add-to-cart-btn">Add to Cart</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="preview-image">
+                <img id="mainPreview" src="{{ product.main_image.url }}" alt="{{ product.name }}">
+            </div>
         </div>
 
-        <!-- Right column -->
-        <div class="preview-image">
-            <img id="mainPreview" src="{{ product.main_image.url }}" alt="{{ product.name }}">
-        </div>
-    </div>
-
-</section>
+    </section>
 </body>
 </html>
 
@@ -80,4 +82,40 @@
             mainPreview.src = thumbnail.src;
         });
     });
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("add-to-cart-btn");
+    if (!btn) return; // No button if product is out of stock
+
+    btn.addEventListener("click", () => {
+        const box = document.querySelector(".add-to-cart-box");
+        const productId = box.dataset.productId;
+        const quantity = document.getElementById("quantity").value;
+
+        const formData = new FormData();
+        formData.append("quantity", quantity)
+
+        fetch(`/cart/add/${productId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}", 
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("stock-count").textContent = data.stock;
+                alert("Item added to cart!");
+            } else {
+                alert(data.error || "Could not add to cart");
+            }
+        });
+    });
+});
 </script>
